@@ -1,5 +1,10 @@
 package scr;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Set;
+
 public class SimpleDriver extends Controller {
 
 	/* Costanti di cambio marcia */
@@ -138,7 +143,8 @@ public class SimpleDriver extends Controller {
 			return (float) 0.3;
 	}
 
-	public Action control(SensorModel sensors) {
+	public Action control(SensorModel sensors, HashMap<String, LocalDateTime> keyPressed) 
+	{
 		// Controlla se l'auto è attualmente bloccata
 		/**
 			Se l'auto ha un angolo, rispetto alla traccia, superiore a 30°
@@ -196,13 +202,7 @@ public class SimpleDriver extends Controller {
 			int gear = getGear(sensors);
 
 			// Calcolo angolo di sterzata
-			float steer = getSteer(sensors);
-
-			// Normalizzare lo sterzo
-			if (steer < -1)
-				steer = -1;
-			if (steer > 1)
-				steer = 1;
+			float steer = 0;
 
 			// Impostare accelerazione e frenata dal comando congiunto accelerazione/freno
 			float accel, brake;
@@ -219,10 +219,91 @@ public class SimpleDriver extends Controller {
 
 			// Costruire una variabile CarControl e restituirla
 			Action action = new Action();
+
+			long At = 0;
+				
+			long Dt = 0;
+
+			long Wt = 0;
+			long St = 0;
+			
+			int secondInMills = 1_000;
+			if(keyPressed.get("A") != null)
+			{
+				At = Duration.between(keyPressed.get("A"), LocalDateTime.now()).toMillis();
+				if(At > secondInMills)
+					At = secondInMills;
+				
+				action.steering = 1 * (At/(double)secondInMills);
+			}
+			else if(keyPressed.get("D") != null)
+			{
+				Dt = Duration.between(keyPressed.get("D"), LocalDateTime.now()).toMillis();
+
+				if(Dt > secondInMills)
+					Dt = secondInMills;
+
+				action.steering = -1 * (Dt/(double)secondInMills);
+			}
+			else
+			{
+				action.steering = 0;
+			}
+
+			if(keyPressed.get("W") != null)
+			{
+				Wt = Duration.between(keyPressed.get("W"), LocalDateTime.now()).toMillis();
+				
+				if(Wt > secondInMills)
+					Wt = secondInMills;
+
+				long TT = At;
+				if(TT == 0){
+					TT = Dt;
+					Wt = 1_000;
+				}
+
+				if (Math.abs(Wt - TT) <= 200 && TT != 0)
+				{
+					Wt = 300;
+					TT = 100;
+				}
+				
+				action.accelerate = 1 * Math.abs(((double)Wt - (double)TT)/(double)secondInMills);
+
+				System.out.print("\n!!!!!!! " + action.accelerate + " !!!!!!!\n");
+			}
+			else 
+			{
+				action.accelerate = 0;
+				if(keyPressed.get("S") != null)
+				{
+					/*
+					// It's useless a temporizator on brake
+					St = Duration.between(keyPressed.get("S"), LocalDateTime.now()).toMillis();
+
+					if(St > secondInMills)
+						St = secondInMills;
+
+					long TT = At;
+					if(TT == 0)
+						TT = Dt;
+
+					if (Math.abs(St - TT) <= 200)
+					{
+						St = 300;
+						TT = 100;
+					}
+ 					*/
+					action.brake = filterABS(sensors, -accel_and_brake);
+				}
+				else
+				{
+					action.brake = 0;
+				}
+			}
+			// Questa è una prova
 			action.gear = gear;
-			action.steering = steer;
-			action.accelerate = accel;
-			action.brake = brake;
 			action.clutch = clutch;
 			return action;
 		}

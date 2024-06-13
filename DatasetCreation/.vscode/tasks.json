@@ -1,0 +1,31 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "runTorcsAndCompile",
+            "type": "shell",
+            "command": "cmd.exe",
+            "args": [
+                "/c",
+                "javac -d ${workspaceFolder}\\src\\classes ${workspaceFolder}\\src\\scr\\*.java"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Generated task to compile Java sources"
+        },
+        {
+            "label": "run torcs",
+            "type": "shell",
+            "command": "echo Running torcs && start cmd /k \"C:\\Program^ Files^ ^(x86^)\\torcs\\wtorcs.exe\" -nofuel && echo Compiling && ",
+            "args": [
+                "-nofuel"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

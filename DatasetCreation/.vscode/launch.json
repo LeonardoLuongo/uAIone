@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "OurContinuousCharReaderUI",
+            "request": "launch",
+            "mainClass": "scr.OurContinuousCharReaderUI",
+            "projectName": "uAIone_c3946475"
+        },
+        {
+            "type": "java",
+            "name": "Launch Client",
+            "request": "launch",
+            "mainClass": "scr.Client",
+            "args": [
+                "scr.SimpleDriver",
+                "host:localhost",
+                "port:3001"
+            ],
+            "preLaunchTask": "runTorcsAndCompile",
+            "classPaths": [
+                "${workspaceFolder}\\src\\classes"
+            ],
+            "cwd": "${workspaceFolder}\\src"
+        }
+    ]
+}

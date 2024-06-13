@@ -3,7 +3,12 @@
  */
 package scr;
 
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.function.Predicate;
+
+import javax.swing.SwingUtilities;
+
 import scr.Controller.Stage;
 
 /**
@@ -21,6 +26,8 @@ public class Client {
 	private static int maxSteps;
 	private static Stage stage;
 	private static String trackName;
+
+	private static final String FILENAME = "../dataset/dataset.csv";
 
 	/**
 	 * @param args viene utilizzato per definire tutte le opzioni del client.
@@ -51,6 +58,18 @@ public class Client {
 		}
 		initStr = initStr + ")";
 
+		OurContinuousCharReaderUI charReaderUI = new OurContinuousCharReaderUI();
+
+		SwingUtilities.invokeLater(() -> charReaderUI.start());
+
+		Sampler sampler;
+		try {
+			sampler = new Sampler(FILENAME);
+		} catch (Exception e) {
+			sampler = null;
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 		long curEpisode = 0;
 		boolean shutdownOccurred = false;
 		do {
@@ -67,6 +86,7 @@ public class Client {
 			/*
 			 * Start to drive
 			 */
+
 			long currStep = 0;
 			while (true) {
 				/*
@@ -97,7 +117,55 @@ public class Client {
 
 					Action action = new Action();
 					if (currStep < maxSteps || maxSteps == 0)
-						action = driver.control(new MessageBasedSensorModel(inMsg));
+					{
+						MessageBasedSensorModel msg = new MessageBasedSensorModel(inMsg);
+						action = driver.control(msg, charReaderUI.getKeysPressed());
+						
+						String actionStr = action.toString();
+						try {
+							MessageBasedSensorModel cloneMsg = (MessageBasedSensorModel)msg.clone();
+						} catch (CloneNotSupportedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						// thread.setNewMessageFlag(true);
+
+						String textMsg = msg.getSpeed() + "," +
+							msg.getAngleToTrackAxis() + "," +
+							arrayToString(msg.getTrackEdgeSensors()) + "," +
+							arrayToString(msg.getFocusSensors()) + "," +
+							msg.getGear() + "," +
+							arrayToString(msg.getOpponentSensors()) + "," +
+							msg.getRacePosition() + "," +
+							msg.getLateralSpeed() + "," +
+							msg.getCurrentLapTime() + "," +
+							msg.getDamage() + "," +
+							msg.getDistanceFromStartLine() + "," +
+							msg.getDistanceRaced() + "," +
+							msg.getFuelLevel() + "," +
+							msg.getLastLapTime() + "," +
+							msg.getRPM() + "," +
+							msg.getTrackPosition() + "," +
+							arrayToString(msg.getWheelSpinVelocity()) + "," +
+							msg.getZ() + "," +
+							msg.getZSpeed();
+						String sample = textMsg + action.toString();
+						sample = 
+							sample.toString()
+											.replaceAll("\\(", ",")
+											.replaceAll("\\)", "")
+											.replaceAll(" ", "");
+
+						
+						try {
+							if (sampler != null) {
+								sampler.writeIntoDataset("../dataset/dataset.csv", sample, null);
+							}
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
 					else
 						action.restartRace = true;
 
@@ -196,5 +264,22 @@ public class Client {
 			e.printStackTrace();
 		}
 		return controller;
+	}
+
+	private static String arrayToString(double[] array) {
+		if (array == null || array.length == 0) {
+			return "[]";
+		}
+	
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		for (int i = 0; i < array.length; i++) {
+			sb.append(array[i]);
+			if (i < array.length - 1) {
+				sb.append(",");
+			}
+		}
+		sb.append("]");
+		return sb.toString();
 	}
 }

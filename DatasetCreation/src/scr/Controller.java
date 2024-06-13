@@ -1,5 +1,10 @@
 package scr;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 public abstract class Controller {
 
 	public enum Stage {
@@ -46,7 +51,7 @@ public abstract class Controller {
 		this.trackName = trackName;
 	}
 
-	public abstract Action control(SensorModel sensors);
+	public abstract Action control(SensorModel sensors, HashMap<String, LocalDateTime> keyPressed);
 
 	public abstract void reset(); // called at the beginning of each new trial
 

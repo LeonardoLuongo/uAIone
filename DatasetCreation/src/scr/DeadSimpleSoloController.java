@@ -1,5 +1,9 @@
 package scr;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Set;
+
 /**
  * Created by IntelliJ IDEA. User: Administrator Date: Mar 4, 2008 Time: 4:59:21
  * PM
@@ -9,7 +13,7 @@ public class DeadSimpleSoloController extends Controller {
 
 	final double targetSpeed = 15;
 
-	public Action control(SensorModel sensorModel) {
+	public Action control(SensorModel sensorModel, HashMap<String, LocalDateTime>  keyPressed) {
 		Action action = new Action();
 		if (sensorModel.getSpeed() < targetSpeed) {
 			action.accelerate = 1;
