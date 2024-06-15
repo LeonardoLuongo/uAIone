@@ -3,13 +3,22 @@
  */
 package scr;
 
+import java.net.InetAddress;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.Vector;
 import java.util.function.Predicate;
 
 import javax.swing.SwingUtilities;
 
 import scr.Controller.Stage;
+import scr.Host;
+import scr.Peer;
 
 /**
  * @author Daniele Loiacono
@@ -60,16 +69,55 @@ public class Client {
 
 		OurContinuousCharReaderUI charReaderUI = new OurContinuousCharReaderUI();
 
+		Peer dswSocket = null;
+		Host remoteHost = null;
+		if(Arrays.asList(args).contains("sampler:on"))
+		{
+			try {
+				// Command to execute
+				String command = "cmd /k java DatasetWriter.java";
+
+				// Execute the command
+				// Runtime.getRuntime().exec(command);
+				
+				Map<String, String> propertiesNames = new HashMap<>();
+				propertiesNames.put("dsw_ip", "dsw_to_client.ip");
+				propertiesNames.put("dsw_port", "dsw_to_client.port");
+				propertiesNames.put("this_ip", "client_to_dsw.ip");
+				propertiesNames.put("this_port", "client_to_dsw.port");
+
+				
+				Collection<String> values = propertiesNames.values();
+				String[] stringArray = new String[values.size()];
+				int index = 0;
+				for (Object obj : values) {
+					if (obj instanceof String) {
+						stringArray[index++] = (String) obj;
+					} else {
+						System.err.println("a propertyName isn't a sting.");
+					}
+				}
+				HashMap<String, String> props = Utility.readProperties(stringArray);
+				System.out.println(propertiesNames);
+				System.out.println(props);
+				Host thisHost = new Host(
+					InetAddress.getByName(props.get(propertiesNames.get("this_ip"))), 
+					Integer.parseInt(props.get(propertiesNames.get("this_port")))
+				);
+				remoteHost = new Host(
+					InetAddress.getByName(props.get(propertiesNames.get("dsw_ip"))), 
+					Integer.parseInt(props.get(propertiesNames.get("dsw_port")))
+				);
+
+				dswSocket = new Peer(thisHost.getAddress(), thisHost.getPort());
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
 		SwingUtilities.invokeLater(() -> charReaderUI.start());
 
-		Sampler sampler;
-		try {
-			sampler = new Sampler(FILENAME);
-		} catch (Exception e) {
-			sampler = null;
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
 		long curEpisode = 0;
 		boolean shutdownOccurred = false;
 		do {
@@ -120,50 +168,46 @@ public class Client {
 					{
 						MessageBasedSensorModel msg = new MessageBasedSensorModel(inMsg);
 						action = driver.control(msg, charReaderUI.getKeysPressed());
-						
-						String actionStr = action.toString();
-						try {
-							MessageBasedSensorModel cloneMsg = (MessageBasedSensorModel)msg.clone();
-						} catch (CloneNotSupportedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						// thread.setNewMessageFlag(true);
-
-						String textMsg = msg.getSpeed() + "," +
-							msg.getAngleToTrackAxis() + "," +
-							arrayToString(msg.getTrackEdgeSensors()) + "," +
-							arrayToString(msg.getFocusSensors()) + "," +
-							msg.getGear() + "," +
-							arrayToString(msg.getOpponentSensors()) + "," +
-							msg.getRacePosition() + "," +
-							msg.getLateralSpeed() + "," +
-							msg.getCurrentLapTime() + "," +
-							msg.getDamage() + "," +
-							msg.getDistanceFromStartLine() + "," +
-							msg.getDistanceRaced() + "," +
-							msg.getFuelLevel() + "," +
-							msg.getLastLapTime() + "," +
-							msg.getRPM() + "," +
-							msg.getTrackPosition() + "," +
-							arrayToString(msg.getWheelSpinVelocity()) + "," +
-							msg.getZ() + "," +
-							msg.getZSpeed();
-						String sample = textMsg + action.toString();
-						sample = 
-							sample.toString()
+												
+						if (dswSocket != null)
+						{
+							String textMsg = formatDouble(msg.getSpeed()) + "," +
+									formatDouble(msg.getAngleToTrackAxis()) + "," +
+									arrayToString(msg.getTrackEdgeSensors()) + "," +
+									arrayToString(msg.getFocusSensors()) + "," +
+									formatDouble(msg.getGear()) + "," +
+									arrayToString(msg.getOpponentSensors()) + "," +
+									formatDouble(msg.getRacePosition()) + "," +
+									formatDouble(msg.getLateralSpeed()) + "," +
+									formatDouble(msg.getCurrentLapTime()) + "," +
+									formatDouble(msg.getDamage()) + "," +
+									formatDouble(msg.getDistanceFromStartLine()) + "," +
+									formatDouble(msg.getDistanceRaced()) + "," +
+									formatDouble(msg.getFuelLevel()) + "," +
+									formatDouble(msg.getLastLapTime()) + "," +
+									formatDouble(msg.getRPM()) + "," +
+									formatDouble(msg.getTrackPosition()) + "," +
+									arrayToString(msg.getWheelSpinVelocity()) + "," +
+									formatDouble(msg.getZ()) + "," +
+									formatDouble(msg.getZSpeed());
+									String sample = textMsg + action;
+							sample = sample.replace("accel", "")
+											.replace("brake", "")
+											.replace("gear", "")
+											.replace("steer", "")
+											.replace("clutch", "")
+											.replace("meta", "")
+											.replace("focus", "")
 											.replaceAll("\\(", ",")
 											.replaceAll("\\)", "")
 											.replaceAll(" ", "");
 
-						
-						try {
-							if (sampler != null) {
-								sampler.writeIntoDataset("../dataset/dataset.csv", sample, null);
+							try {
+								dswSocket.sendString(sample + "#!", remoteHost);
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
 							}
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
 						}
 					}
 					else
@@ -265,21 +309,23 @@ public class Client {
 		}
 		return controller;
 	}
-
+	
 	private static String arrayToString(double[] array) {
 		if (array == null || array.length == 0) {
 			return "[]";
 		}
 	
 		StringBuilder sb = new StringBuilder();
-		sb.append("[");
 		for (int i = 0; i < array.length; i++) {
-			sb.append(array[i]);
+			sb.append(formatDouble(array[i]));
 			if (i < array.length - 1) {
 				sb.append(",");
 			}
 		}
-		sb.append("]");
 		return sb.toString();
 	}
+
+    private static String formatDouble(double value) {
+        return String.format(Locale.US, "%4.8f", value); // Format to 6 decimal places
+    }
 }
