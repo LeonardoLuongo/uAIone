@@ -1,3 +1,6 @@
+# Questa classe carica un dataset, addestra un modello di rete neurale MLP con i dati,
+# e poi ascolta messaggi da un client via UDP. Quando riceve dati, fa una previsione e 
+# invia i risultati a un altro host. 
 
 import sys
 import os

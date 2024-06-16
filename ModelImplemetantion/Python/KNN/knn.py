@@ -1,3 +1,9 @@
+# Questa classe carica un dataset da un file CSV, 
+# prepara i dati dividendo le colonne in features e target,
+# suddivide i dati in set di addestramento e test, 
+# addestra un modello KNN per predire i valori target basati sulle features, 
+# e infine esegue una predizione utilizzando il modello addestrato.
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsRegressor

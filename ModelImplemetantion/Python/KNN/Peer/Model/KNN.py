@@ -1,3 +1,7 @@
+# Questa classe definisce il classificatore KNN. Si calcolano i valori target 
+# per un dato punto predittivo stimando la media dei valori target delle istanze 
+# di addestramento più vicine in base alla distanza euclidea.
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsRegressor

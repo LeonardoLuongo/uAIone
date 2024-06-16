@@ -1,3 +1,7 @@
+# Questa classe implementa un modello di regressione K-Nearest Neighbors (KNN) 
+# utilizzando la libreria Scikit-learn. Il modello è inizializzato con 25 vicini 
+# come valore predefinito.
+
 import sys
 import os
 from io import StringIO

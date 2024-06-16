@@ -1,3 +1,6 @@
+# Questa classe, grazie alla libreria Scikit-learn, permette di creare, 
+# addestrare e fare previsioni con un modello di rete neurale MLP.
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsRegressor

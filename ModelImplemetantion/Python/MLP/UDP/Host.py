@@ -1,3 +1,5 @@
+# La classe Host rappresenta un host di rete con un indirizzo e una porta.
+
 import socket
 
 class Host:

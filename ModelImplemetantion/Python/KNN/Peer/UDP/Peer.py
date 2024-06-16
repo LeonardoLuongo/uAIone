@@ -1,3 +1,6 @@
+# La classe Peer utilizza socket UDP per ricevere e 
+# inviare dati a un host remoto utilizzando oggetti Host.
+
 import socket
 from . import Host
 
