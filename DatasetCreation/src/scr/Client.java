@@ -48,10 +48,13 @@ public class Client
 	 *             - maxSteps:N viene utilizzato per impostare il numero massimo di passaggi per ogni episodio (il valore predefinito è 0, che significa numero illimitato di passaggi).
 	 *             - stage:N viene utilizzato per impostare lo stadio corrente: 0 è WARMUP, 1 è QUALIFYING, 2 è RACE, altri valori significano UNKNOWN (il valore predefinito è UNKNOWN).
 	 *             - trackName:nome viene utilizzato per impostare il nome della pista attuale.
+	 * @throws Exception 
 	 */
 
-	public static void main(String[] args) 
+	public static void main(String[] args) throws Exception 
 	{
+		Logger logger = new Logger(null, "[Client]");
+
 		parseParameters(args);
 		SocketHandler mySocket = new SocketHandler(host, port, verbose);
 		String inMsg;
@@ -69,6 +72,15 @@ public class Client
 
 		Peer dswSocket = null;
 		Host remoteHost = null;
+		try {
+			dswSocket = new Peer();
+			remoteHost = new Host();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			logger.log(e.getMessage() + "\n");
+		}
+		
 		initSocket(dswSocket,remoteHost, args);
 
 		SwingUtilities.invokeLater(() -> charReaderUI.start());
@@ -197,8 +209,16 @@ public class Client
 		return sample;
 	}
 
-	private static void initSocket(Peer dswSocket, Host remoteHost, String[] args) 
+	private static void initSocket(Peer dswSocket, Host remoteHost, String[] args) throws Exception
 	{
+		if(dswSocket == null){
+			throw new Exception("dswSocket was null");
+		}
+
+		if (remoteHost == null) {
+			throw new Exception("remoteHost was null");
+		}
+	
 		if(Arrays.asList(args).contains("sampler:on"))
 		{
 			try 
@@ -231,18 +251,14 @@ public class Client
 					}
 				}
 				HashMap<String, String> props = Utility.readProperties(stringArray);
-				System.out.println(propertiesNames);
-				System.out.println(props);
 				Host thisHost = new Host(
 					InetAddress.getByName(props.get(propertiesNames.get("this_ip"))), 
 					Integer.parseInt(props.get(propertiesNames.get("this_port")))
 				);
-				remoteHost = new Host(
-					InetAddress.getByName(props.get(propertiesNames.get("dsw_ip"))), 
-					Integer.parseInt(props.get(propertiesNames.get("dsw_port")))
-				);
+				remoteHost.setAddress(InetAddress.getByName(props.get(propertiesNames.get("dsw_ip"))));
+				remoteHost.setPort(Integer.parseInt(props.get(propertiesNames.get("dsw_port"))));
 
-				dswSocket = new Peer(thisHost.getAddress(), thisHost.getPort());
+				dswSocket.setHost(thisHost.getAddress(), thisHost.getPort());
 
 			} catch (Exception e) {
 				e.printStackTrace();

@@ -14,6 +14,12 @@ public class Host
     // Porta dell'host
     private int port;
 
+    public Host() throws Exception
+    {
+        this.addr = InetAddress.getByName("0.0.0.0");
+        this.port = 0;
+    }
+
     public Host(InetAddress addr, int port)
     {
         this.addr = addr;

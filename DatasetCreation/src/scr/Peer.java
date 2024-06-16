@@ -3,6 +3,7 @@ package scr;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 
 public class Peer 
 {
@@ -11,6 +12,11 @@ public class Peer
      */
     private final int DEFAULT_DATAGRAM_BYTES = 100;
     private DatagramSocket socket;
+
+    public Peer() throws Exception
+    {
+        socket = new DatagramSocket(0, InetAddress.getByName("0.0.0.0"));
+    }
 
     public Peer(InetAddress addr, int port) throws Exception
     {
@@ -97,6 +103,11 @@ public class Peer
 
         socket.send(sendPacket);
 
+    }
+
+    public void setHost(InetAddress address, int port) throws SocketException
+    {
+        socket = new DatagramSocket(port, address);
     }
 
 }

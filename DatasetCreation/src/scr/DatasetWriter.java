@@ -19,7 +19,7 @@ public class DatasetWriter
      */
     public static void main(String[] args) throws Exception
     {
-        Logger logger = new Logger("./logs/" + LocalDateTime.now().toString().replaceAll(" ","").replaceAll(":", "_") +".log");
+        Logger logger = new Logger(null, "[DatasetWriter]");
 
         Map<String, String> propertiesNames = new HashMap<>();
         propertiesNames.put("dsw_ip", "dsw_to_client.ip");

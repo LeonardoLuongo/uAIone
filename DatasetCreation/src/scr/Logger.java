@@ -6,6 +6,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Logger
@@ -14,9 +15,15 @@ public class Logger
 {
 
     private BufferedWriter bw;
+    private String myId;
 
-    public Logger(String filename) throws Exception
+    public Logger(String filename, String myId) throws Exception
     {
+        if(filename == null)
+        {
+            filename = "./logs/" + myId + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy_hh_mm")).toString().replaceAll(" ","").replaceAll(":", "_") +".log";
+        }
+
         // Normalize the filename to handle relative paths properly
         String filePath = new File(filename).getAbsolutePath();
         
@@ -36,12 +43,20 @@ public class Logger
         emptyFile(filename);
 
         this.bw = new BufferedWriter(new FileWriter(filename, true)); 
-        this.log("Logger File Created.");
+
+        this.myId = myId;
+
+        this.log("Logger File Created.\n");
     }
 
     public void log(String message) throws Exception
     {
-        this.bw.write(LocalDateTime.now().toString() + ": " + message);
+        this.bw.write(LocalDateTime.now().toString() + " --> " + this.myId + ": " + message + "\n");
+        
+        // Debug
+        // System.out.println(LocalDateTime.now().toString() + ": " + message);
+        
+        this.bw.flush();
     }
     
     public static void emptyFile(String filename) throws Exception {
