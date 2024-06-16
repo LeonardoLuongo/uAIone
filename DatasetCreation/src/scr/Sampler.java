@@ -5,7 +5,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class Sampler {
+public class Sampler 
+{
+    /*
+     * Questa classe gestisce il campionamento e la scrittura dei dati in un file CSV.
+     */
     public long index = 0;
 
     private static final int NUM_TRACK_EDGE_SENSORS = 19;
@@ -15,7 +19,8 @@ public class Sampler {
 
     private BufferedWriter bw;
 
-    public Sampler(String filename) throws Exception {
+    public Sampler(String filename) throws Exception 
+    {
         // Normalize the filename to handle relative paths properly
         String filePath = new File(filename).getAbsolutePath();
         
@@ -37,27 +42,28 @@ public class Sampler {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < NUM_TRACK_EDGE_SENSORS; i++) {
-sb.append("trackEdgeSensor_" + i + ",");
-}
-String trackEdgeSensors = sb.toString();
+            sb.append("trackEdgeSensor_" + i + ",");
+        }
+        String trackEdgeSensors = sb.toString();
         
         sb = new StringBuilder();
         for (int i = 0; i < NUM_FOCUS_SENSORS; i++) {
-sb.append("focusSensor_" + i + ",");
-}
-String focusSensors = sb.toString();
+            sb.append("focusSensor_" + i + ",");
+        }
+        String focusSensors = sb.toString();
         
         sb = new StringBuilder();
-        for (int i = 0; i < NUM_OPPONENT_SENSORS; i++) {
-sb.append("opponentSensor_" + i + ",");
-}
-String opponentSensors = sb.toString();
+        for (int i = 0; i < NUM_OPPONENT_SENSORS; i++) 
+        {
+            sb.append("opponentSensor_" + i + ",");
+        }
+        String opponentSensors = sb.toString();
 
         sb = new StringBuilder();
         for (int i = 0; i < NUM_WHEEL_SPIN_VELOCITY; i++) {
-sb.append("wheelSpinVelocity_" + i + ",");
-}
-String wheelSpinVelocity = sb.toString();
+            sb.append("wheelSpinVelocity_" + i + ",");
+        }
+        String wheelSpinVelocity = sb.toString();
 
         this.bw = new BufferedWriter(new FileWriter(filename, true), 8200); // (~8 KB)
         String header = filename + ",speed,angleToTrackAxis," + trackEdgeSensors + focusSensors + "gear," + opponentSensors +"racePosition," +

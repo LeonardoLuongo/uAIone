@@ -6,6 +6,13 @@
             "name": "DatasetWriter",
             "request": "launch",
             "mainClass": "scr.DatasetWriter",
+            "projectName": "DatasetCreation_ad948f5a"
+        },
+        {
+            "type": "java",
+            "name": "DatasetWriter",
+            "request": "launch",
+            "mainClass": "scr.DatasetWriter",
             "projectName": "DatasetCreation_11caddbd"
         },
         {

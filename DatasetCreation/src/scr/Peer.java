@@ -6,6 +6,9 @@ import java.net.InetAddress;
 
 public class Peer 
 {
+    /*
+     * Questa classe permette la comunicazione UDP tramite la classe DatagramSocket
+     */
     private final int DEFAULT_DATAGRAM_BYTES = 100;
     private DatagramSocket socket;
 

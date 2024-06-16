@@ -7,11 +7,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-/**
- * Created by IntelliJ IDEA. User: Administrator Date: Mar 4, 2008 Time: 3:44:29
- * PM
- */
-public class MessageBasedSensorModel implements SensorModel, Cloneable, Serializable {
+public class MessageBasedSensorModel implements SensorModel, Serializable
+{
 
 	private MessageParser message;
 

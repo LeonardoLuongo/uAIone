@@ -1,10 +1,12 @@
 package scr;
 
-/**
- * Created by IntelliJ IDEA. User: Administrator Date: Mar 4, 2008 Time: 3:35:31
- * PM
- */
-public class Action {
+public class Action 
+{
+	/* 
+	 * Questa classe rappresenta le azioni che possono essere eseguite all'interno delle simulazioni di gara.
+	 * Il metodo toString fornisce una stringa formattata dei valori delle azioni, mentre il metodo 
+	 * limitValues assicura che questi valori rimangano all'interno dei loro range validi.
+	 */
 
 	public double accelerate = 0; // 0..1
 	public double brake = 0; // 0..1
@@ -15,14 +17,16 @@ public class Action {
 	public int focus = 360;	// ML Angolo di messa a fuoco desiderato in gradi [-90; 90],
 							// impostare 360 se non si desidera alcuna lettura della messa a fuoco!
 
-	public String toString() {
+	public String toString() 
+	{
 		limitValues();
 		return "(accel " + accelerate + ") " + "(brake " + brake + ") " + "(clutch " + clutch + ") " + "(gear " + gear
 				+ ") " + "(steer " + steering + ") " + "(meta " + (restartRace ? 1 : 0) + ") " + "(focus " + focus // ML
 				+ ")";
 	}
 
-	public void limitValues() {
+	public void limitValues()
+	{
 		accelerate = Math.max(0, Math.min(1, accelerate));
 		brake = Math.max(0, Math.min(1, brake));
 		clutch = Math.max(0, Math.min(1, clutch));

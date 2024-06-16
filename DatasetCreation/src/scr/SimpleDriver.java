@@ -5,7 +5,13 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Set;
 
-public class SimpleDriver extends Controller {
+public class SimpleDriver extends Controller 
+{
+	/*
+ 	 * Questa classe implementa un semplice driver per il gioco di simulazione di guida.
+ 	 * Estende la classe astratta Controller e implementa il metodo di controllo per
+ 	 * gestire le varie azioni.
+	 */
 	
 	private LocalDateTime l;
 

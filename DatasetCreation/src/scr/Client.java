@@ -1,6 +1,3 @@
-/**
- * 
- */
 package scr;
 
 import java.net.InetAddress;
@@ -20,12 +17,15 @@ import scr.Controller.Stage;
 import scr.Host;
 import scr.Peer;
 
-/**
- * @author Daniele Loiacono
- * 
- */
-public class Client {
 
+public class Client 
+{
+	/*
+	* Client per interfacciarsi con un server TORCS (The Open Racing Car Simulator).
+	* Il client gestisce la connessione tramite socket UDP, riceve lo stato di gioco
+	* dal server, elabora le azioni del driver tramite un controller specificato,
+	* e invia le azioni al server per controllare il veicolo virtuale.
+	*/
 	private static int UDP_TIMEOUT = 10000;
 	private static int port;
 	private static String host;
@@ -50,7 +50,8 @@ public class Client {
 	 *             - trackName:nome viene utilizzato per impostare il nome della pista attuale.
 	 */
 
-	public static void main(String[] args) {
+	public static void main(String[] args) 
+	{
 		parseParameters(args);
 		SocketHandler mySocket = new SocketHandler(host, port, verbose);
 		String inMsg;
@@ -61,60 +62,14 @@ public class Client {
 
 		/* Build init string */
 		float[] angles = driver.initAngles();
-		String initStr = clientId + "(init";
-		for (int i = 0; i < angles.length; i++) {
-			initStr = initStr + " " + angles[i];
-		}
-		initStr = initStr + ")";
-
+		String initStr;
+		initStr=buildInitString(angles);
+		
 		OurContinuousCharReaderUI charReaderUI = new OurContinuousCharReaderUI();
 
 		Peer dswSocket = null;
 		Host remoteHost = null;
-		if(Arrays.asList(args).contains("sampler:on"))
-		{
-			try {
-				// Command to execute
-				String command = "cmd /k java DatasetWriter.java";
-
-				// Execute the command
-				// Runtime.getRuntime().exec(command);
-				
-				Map<String, String> propertiesNames = new HashMap<>();
-				propertiesNames.put("dsw_ip", "dsw_to_client.ip");
-				propertiesNames.put("dsw_port", "dsw_to_client.port");
-				propertiesNames.put("this_ip", "client_to_dsw.ip");
-				propertiesNames.put("this_port", "client_to_dsw.port");
-
-				
-				Collection<String> values = propertiesNames.values();
-				String[] stringArray = new String[values.size()];
-				int index = 0;
-				for (Object obj : values) {
-					if (obj instanceof String) {
-						stringArray[index++] = (String) obj;
-					} else {
-						System.err.println("a propertyName isn't a sting.");
-					}
-				}
-				HashMap<String, String> props = Utility.readProperties(stringArray);
-				System.out.println(propertiesNames);
-				System.out.println(props);
-				Host thisHost = new Host(
-					InetAddress.getByName(props.get(propertiesNames.get("this_ip"))), 
-					Integer.parseInt(props.get(propertiesNames.get("this_port")))
-				);
-				remoteHost = new Host(
-					InetAddress.getByName(props.get(propertiesNames.get("dsw_ip"))), 
-					Integer.parseInt(props.get(propertiesNames.get("dsw_port")))
-				);
-
-				dswSocket = new Peer(thisHost.getAddress(), thisHost.getPort());
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		initSocket(dswSocket,remoteHost, args);
 
 		SwingUtilities.invokeLater(() -> charReaderUI.start());
 
@@ -171,38 +126,14 @@ public class Client {
 												
 						if (dswSocket != null)
 						{
-							String textMsg = formatDouble(msg.getSpeed()) + "," +
-									formatDouble(msg.getAngleToTrackAxis()) + "," +
-									arrayToString(msg.getTrackEdgeSensors()) + "," +
-									arrayToString(msg.getFocusSensors()) + "," +
-									formatDouble(msg.getGear()) + "," +
-									arrayToString(msg.getOpponentSensors()) + "," +
-									formatDouble(msg.getRacePosition()) + "," +
-									formatDouble(msg.getLateralSpeed()) + "," +
-									formatDouble(msg.getCurrentLapTime()) + "," +
-									formatDouble(msg.getDamage()) + "," +
-									formatDouble(msg.getDistanceFromStartLine()) + "," +
-									formatDouble(msg.getDistanceRaced()) + "," +
-									formatDouble(msg.getFuelLevel()) + "," +
-									formatDouble(msg.getLastLapTime()) + "," +
-									formatDouble(msg.getRPM()) + "," +
-									formatDouble(msg.getTrackPosition()) + "," +
-									arrayToString(msg.getWheelSpinVelocity()) + "," +
-									formatDouble(msg.getZ()) + "," +
-									formatDouble(msg.getZSpeed());
-									String sample = textMsg + action;
-							sample = sample.replace("accel", "")
-											.replace("brake", "")
-											.replace("gear", "")
-											.replace("steer", "")
-											.replace("clutch", "")
-											.replace("meta", "")
-											.replace("focus", "")
-											.replaceAll("\\(", ",")
-											.replaceAll("\\)", "")
-											.replaceAll(" ", "");
-
+							String sample = formatMsgToSample(msg, action);
+							
 							try {
+								// Si aggiunge "#!" come carattere delimitatore della stringa poiché 
+								// la dimensione del pacchetto UDP è fissato ad un valore che 
+								// sarà sicuramente superiore. Quindi il client provvederà a troncare 
+								// il nuovo messaggio fino a "#!". Questo raggionamento è valido solo
+								// per la comunicazione con la classe DatasetWriter. 
 								dswSocket.sendString(sample + "#!", remoteHost);
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
@@ -229,6 +160,105 @@ public class Client {
 		System.out.println("Client shutdown.");
 		System.out.println("Bye, bye!");
 
+	}
+
+	private static String formatMsgToSample(MessageBasedSensorModel msg, Action action) 
+	{
+		String textMsg = formatDouble(msg.getSpeed()) + "," +
+							formatDouble(msg.getAngleToTrackAxis()) + "," +
+							arrayToString(msg.getTrackEdgeSensors()) + "," +
+							arrayToString(msg.getFocusSensors()) + "," +
+							formatDouble(msg.getGear()) + "," +
+							arrayToString(msg.getOpponentSensors()) + "," +
+							formatDouble(msg.getRacePosition()) + "," +
+							formatDouble(msg.getLateralSpeed()) + "," +
+							formatDouble(msg.getCurrentLapTime()) + "," +
+							formatDouble(msg.getDamage()) + "," +
+							formatDouble(msg.getDistanceFromStartLine()) + "," +
+							formatDouble(msg.getDistanceRaced()) + "," +
+							formatDouble(msg.getFuelLevel()) + "," +
+							formatDouble(msg.getLastLapTime()) + "," +
+							formatDouble(msg.getRPM()) + "," +
+							formatDouble(msg.getTrackPosition()) + "," +
+							arrayToString(msg.getWheelSpinVelocity()) + "," +
+							formatDouble(msg.getZ()) + "," +
+							formatDouble(msg.getZSpeed());
+		String sample = textMsg + action;
+		sample = sample.replace("accel", "")
+						.replace("brake", "")
+						.replace("gear", "")
+						.replace("steer", "")
+						.replace("clutch", "")
+						.replace("meta", "")
+						.replace("focus", "")
+						.replaceAll("\\(", ",")
+						.replaceAll("\\)", "")
+						.replaceAll(" ", "");
+		return sample;
+	}
+
+	private static void initSocket(Peer dswSocket, Host remoteHost, String[] args) 
+	{
+		if(Arrays.asList(args).contains("sampler:on"))
+		{
+			try 
+			{
+				// Command to execute
+				String command = "cmd /k java DatasetWriter.java";
+
+				// Execute the command
+				// Runtime.getRuntime().exec(command);
+				
+				Map<String, String> propertiesNames = new HashMap<>();
+				propertiesNames.put("dsw_ip", "dsw_to_client.ip");
+				propertiesNames.put("dsw_port", "dsw_to_client.port");
+				propertiesNames.put("this_ip", "client_to_dsw.ip");
+				propertiesNames.put("this_port", "client_to_dsw.port");
+
+				
+				Collection<String> values = propertiesNames.values();
+				String[] stringArray = new String[values.size()];
+				int index = 0;
+				for (Object obj : values) 
+				{
+					if (obj instanceof String) 
+					{
+						stringArray[index++] = (String) obj;
+					} 
+					else 
+					{
+						System.err.println("a propertyName isn't a sting.");
+					}
+				}
+				HashMap<String, String> props = Utility.readProperties(stringArray);
+				System.out.println(propertiesNames);
+				System.out.println(props);
+				Host thisHost = new Host(
+					InetAddress.getByName(props.get(propertiesNames.get("this_ip"))), 
+					Integer.parseInt(props.get(propertiesNames.get("this_port")))
+				);
+				remoteHost = new Host(
+					InetAddress.getByName(props.get(propertiesNames.get("dsw_ip"))), 
+					Integer.parseInt(props.get(propertiesNames.get("dsw_port")))
+				);
+
+				dswSocket = new Peer(thisHost.getAddress(), thisHost.getPort());
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private static String buildInitString(float[] angles)
+	{
+		String initStr = clientId + "(init";
+		for (int i = 0; i < angles.length; i++) 
+		{
+			initStr = initStr + " " + angles[i];
+		}
+		initStr = initStr + ")";
+		return initStr;
 	}
 
 	private static void parseParameters(String[] args) {

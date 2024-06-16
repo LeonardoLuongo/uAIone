@@ -10,12 +10,17 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class OurContinuousCharReaderUI extends JFrame {
+public class OurContinuousCharReaderUI extends JFrame 
+{
+    /*
+     * Questa classe implementa un'interfaccia grafica che permette all'utente di 
+     * inserire comandi tramite tastiera [w, a, s, d]. I comandi premuti vengono 
+     * registrati e mostrati nella finestra.
+     */
+
     private JTextField inputField;
     private HashMap<String, LocalDateTime> keysPressed;
 
-    public OurContinuousCharReaderUI()
-    {}
 
     public void start() {
         // Initialize the set to keep track of pressed keys

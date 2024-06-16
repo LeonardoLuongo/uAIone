@@ -8,6 +8,10 @@ import java.util.Properties;
 
 public class Utility
 {
+    /*
+     * Questa classe fornisce metodi statici per leggere le proprietà da un file di configurazione.
+     * Le proprietà lette vengono restituite in una mappa chiave-valore.
+     */
     public static final String PROPERTY_FILENAME = "./config.txt";
 
     public static HashMap<String, String> readProperties(String[] propertiesNames)

@@ -5,22 +5,26 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class Controller {
+public abstract class Controller 
+{
 
-	public enum Stage {
+	public enum Stage 
+	{
 
 		WARMUP, QUALIFYING, RACE, UNKNOWN;
 
-		static Stage fromInt(int value) {
-			switch (value) {
-			case 0:
-				return WARMUP;
-			case 1:
-				return QUALIFYING;
-			case 2:
-				return RACE;
-			default:
-				return UNKNOWN;
+		static Stage fromInt(int value) 
+		{
+			switch (value) 
+			{
+				case 0:
+					return WARMUP;
+				case 1:
+					return QUALIFYING;
+				case 2:
+					return RACE;
+				default:
+					return UNKNOWN;
 			}
 		}
 	};
@@ -28,7 +32,8 @@ public abstract class Controller {
 	private Stage stage;
 	private String trackName;
 
-	public float[] initAngles() {
+	public float[] initAngles() 
+	{
 		float[] angles = new float[19];
 		for (int i = 0; i < 19; ++i)
 			angles[i] = -90 + i * 10;

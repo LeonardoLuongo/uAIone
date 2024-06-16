@@ -1,6 +1,3 @@
-/**
- * 
- */
 package scr;
 
 import java.io.IOException;
@@ -11,18 +8,18 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
-/**
- * @author Daniele Loiacono
- * 
- */
-public class SocketHandler {
-
+public class SocketHandler 
+{
+	/*
+	 * Questa classe gestisce la comunicazione tramite socket UDP verso un host remoto.
+	 */
 	private InetAddress address;
 	private int port;
 	private DatagramSocket socket;
 	private boolean verbose;
 
-	public SocketHandler(String host, int port, boolean verbose) {
+	public SocketHandler(String host, int port, boolean verbose) 
+	{
 
 		// set remote address
 		try {
