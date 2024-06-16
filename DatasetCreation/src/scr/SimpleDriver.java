@@ -6,10 +6,13 @@ import java.util.HashMap;
 import java.util.Set;
 
 public class SimpleDriver extends Controller {
+	
+	private LocalDateTime l;
+
 
 	/* Costanti di cambio marcia */
 	final int[] gearUp = { 5000, 6000, 6000, 6500, 7000, 0 };
-	final int[] gearDown = { 0, 2500, 3000, 3000, 3500, 3500 };
+	final int[] gearDown = { 0, 2500, 3000, 3500, 4500, 5000 };
 
 	/* Constanti */
 	final int stuckTime = 25;
@@ -196,7 +199,7 @@ public class SimpleDriver extends Controller {
 		else //Auto non Bloccata
 		{
 			// Calcolo del comando di accelerazione/frenata
-			float accel_and_brake = getAccel(sensors);
+			//float accel_and_brake = getAccel(sensors);
 
 			// Calcolare marcia da utilizzare
 			int gear = getGear(sensors);
@@ -206,15 +209,7 @@ public class SimpleDriver extends Controller {
 
 			// Impostare accelerazione e frenata dal comando congiunto accelerazione/freno
 			float accel, brake;
-			if (accel_and_brake > 0) {
-				accel = accel_and_brake;
-				brake = 0;
-			} else {
-				accel = 0;
-
-				// Applicare l'ABS al freno
-				brake = filterABS(sensors, -accel_and_brake);
-			}
+			
 			clutch = clutching(sensors, clutch);
 
 			// Costruire una variabile CarControl e restituirla
@@ -253,23 +248,23 @@ public class SimpleDriver extends Controller {
 			if(keyPressed.get("W") != null)
 			{
 				Wt = Duration.between(keyPressed.get("W"), LocalDateTime.now()).toMillis();
-				
-				if(Wt > secondInMills)
-					Wt = secondInMills;
+                
+                if(Wt > secondInMills)
+                    Wt = secondInMills;
 
-				long TT = At;
-				if(TT == 0){
-					TT = Dt;
-					Wt = 1_000;
-				}
+                long TT = At;
+                if(TT == 0){
+                    TT = Dt;
+                    Wt = 1_000;
+                }
 
-				if (Math.abs(Wt - TT) <= 200 && TT != 0)
-				{
-					Wt = 300;
-					TT = 100;
-				}
-				
-				action.accelerate = 1 * Math.abs(((double)Wt - (double)TT)/(double)secondInMills);
+                if (Math.abs(Wt - TT) <= 400 && TT != 0)
+                {
+                    Wt = 500;
+                    TT = 100;
+                }
+                
+                action.accelerate = 1 * Math.abs((350 + (double)Wt - (double)TT)/(double)secondInMills);
 
 				System.out.print("\n!!!!!!! " + action.accelerate + " !!!!!!!\n");
 			}
@@ -295,19 +290,26 @@ public class SimpleDriver extends Controller {
 						TT = 100;
 					}
  					*/
-					action.brake = filterABS(sensors, -accel_and_brake);
+					action.accelerate = 0;
+					action.brake = 1;
+					gear = getGear(sensors);
 				}
 				else
 				{
 					action.brake = 0;
+					gear = getGear(sensors);
 				}
 			}
+			gear = getGear(sensors);
+
+			//clutch = clutching(sensors, clutch);
 			// Questa è una prova
 			action.gear = gear;
-			action.clutch = clutch;
+			//action.clutch = clutch;
 			return action;
 		}
 	}
+
 
 	private float filterABS(SensorModel sensors, float brake) {
 		// Converte la velocità in m/s
