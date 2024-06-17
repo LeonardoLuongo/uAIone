@@ -1,6 +1,7 @@
 package scr;
 
 import java.net.InetAddress;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.swing.SwingUtilities;
 
@@ -58,7 +60,7 @@ public class Client
 		parseParameters(args);
 		SocketHandler mySocket = new SocketHandler(host, port, verbose);
 		String inMsg;
-
+		String keyPressed;
 		Controller driver = load(args[0]);
 		driver.setStage(stage);
 		driver.setTrackName(trackName);
@@ -134,8 +136,9 @@ public class Client
 					if (currStep < maxSteps || maxSteps == 0)
 					{
 						MessageBasedSensorModel msg = new MessageBasedSensorModel(inMsg);
+						//keyPressed= convertKeysPressedToString(charReaderUI.getKeysPressed());
 						action = driver.control(msg, charReaderUI.getKeysPressed());
-												
+
 						if (dswSocket != null)
 						{
 							String sample = formatMsgToSample(msg, action);
@@ -174,6 +177,26 @@ public class Client
 
 	}
 
+	/* 
+	public static String convertKeysPressedToString(HashMap<String, LocalDateTime> keysPressed) 
+	{
+        if (keysPressed == null || keysPressed.isEmpty()) {
+            return "n,n";
+        }
+        String result = keysPressed.keySet().stream()
+                                   .map(String::toLowerCase)
+                                   .collect(Collectors.joining(","));
+
+        if (result.isEmpty()) {
+            return "n";
+        } else if (keysPressed.size() == 1) {
+            return result + ",n";
+        } else {
+            return result;
+        }
+    }
+		*/
+
 	private static String formatMsgToSample(MessageBasedSensorModel msg, Action action) 
 	{
 		String textMsg = formatDouble(msg.getSpeed()) + "," +
@@ -195,7 +218,7 @@ public class Client
 							arrayToString(msg.getWheelSpinVelocity()) + "," +
 							formatDouble(msg.getZ()) + "," +
 							formatDouble(msg.getZSpeed());
-		String sample = textMsg + action;
+		String sample = textMsg + action ;
 		sample = sample.replace("accel", "")
 						.replace("brake", "")
 						.replace("gear", "")
@@ -203,6 +226,8 @@ public class Client
 						.replace("clutch", "")
 						.replace("meta", "")
 						.replace("focus", "")
+						.replace("keyPressed_x", "")
+						.replace("keyPressed_y", "")
 						.replaceAll("\\(", ",")
 						.replaceAll("\\)", "")
 						.replaceAll(" ", "");

@@ -16,13 +16,15 @@ public class Action
 	public boolean restartRace = false;
 	public int focus = 360;	// ML Angolo di messa a fuoco desiderato in gradi [-90; 90],
 							// impostare 360 se non si desidera alcuna lettura della messa a fuoco!
+	public String keyPressed_x = "N";
+	public String keyPressed_y = "N";
 
 	public String toString() 
 	{
 		limitValues();
 		return "(accel " + accelerate + ") " + "(brake " + brake + ") " + "(clutch " + clutch + ") " + "(gear " + gear
 				+ ") " + "(steer " + steering + ") " + "(meta " + (restartRace ? 1 : 0) + ") " + "(focus " + focus // ML
-				+ ")";
+				+ ")" + "(keyPressed_x " + keyPressed_x + ") " + "(keyPressed_y " + keyPressed_y + ") ";
 	}
 
 	public void limitValues()

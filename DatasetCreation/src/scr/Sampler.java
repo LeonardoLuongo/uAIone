@@ -16,6 +16,7 @@ public class Sampler
     private static final int NUM_FOCUS_SENSORS = 5;
     private static final int NUM_OPPONENT_SENSORS = 36;
     private static final int NUM_WHEEL_SPIN_VELOCITY = 4;
+    private static final int NUM_KEY_PRESSED = 2;
 
     private BufferedWriter bw;
 
@@ -68,7 +69,7 @@ public class Sampler
         this.bw = new BufferedWriter(new FileWriter(filename, true), 8200); // (~8 KB)
         String header = filename + ",speed,angleToTrackAxis," + trackEdgeSensors + focusSensors + "gear," + opponentSensors +"racePosition," +
                 "lateralSpeed,currentLapTime,damage,distanceFromStartLine,distanceRaced,fuelLevel,lastLapTime," +
-                "rpm,trackPosition," + wheelSpinVelocity + "z,zSpeed,accel,brake,clutch,gear,steer,meta,focus";
+                "rpm,trackPosition," + wheelSpinVelocity + "z,zSpeed,accel,brake,clutch,gear,steer,meta,focus,keyPressed_x, keyPressed_y";
         
         bw.write(header + "\n");
     }

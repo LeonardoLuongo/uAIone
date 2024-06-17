@@ -231,6 +231,8 @@ public class SimpleDriver extends Controller
 			int secondInMills = 1_000;
 			if(keyPressed.get("A") != null)
 			{
+				action.keyPressed_x="A";
+				//keyPressedString = "A";
 				At = Duration.between(keyPressed.get("A"), LocalDateTime.now()).toMillis();
 				if(At > secondInMills)
 					At = secondInMills;
@@ -239,6 +241,8 @@ public class SimpleDriver extends Controller
 			}
 			else if(keyPressed.get("D") != null)
 			{
+				action.keyPressed_x="D";
+				//keyPressedString = "D";
 				Dt = Duration.between(keyPressed.get("D"), LocalDateTime.now()).toMillis();
 
 				if(Dt > secondInMills)
@@ -248,11 +252,15 @@ public class SimpleDriver extends Controller
 			}
 			else
 			{
+				action.keyPressed_x="N";
+				//keyPressedString = "N";
 				action.steering = 0;
 			}
 
 			if(keyPressed.get("W") != null)
 			{
+				action.keyPressed_y="W";
+				//keyPressedString += ",W";
 				Wt = Duration.between(keyPressed.get("W"), LocalDateTime.now()).toMillis();
                 
                 if(Wt > secondInMills)
@@ -279,6 +287,10 @@ public class SimpleDriver extends Controller
 				action.accelerate = 0;
 				if(keyPressed.get("S") != null)
 				{
+					action.keyPressed_y="S";
+					//action.y = "s"
+					//a,s
+					//keyPressedString += ",S";
 					/*
 					// It's useless a temporizator on brake
 					St = Duration.between(keyPressed.get("S"), LocalDateTime.now()).toMillis();
@@ -302,12 +314,13 @@ public class SimpleDriver extends Controller
 				}
 				else
 				{
+					action.keyPressed_y="N";
+					//keyPressedString += ",N";
 					action.brake = 0;
 					gear = getGear(sensors);
 				}
 			}
 			gear = getGear(sensors);
-
 			//clutch = clutching(sensors, clutch);
 			// Questa è una prova
 			action.gear = gear;
