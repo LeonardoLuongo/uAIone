@@ -1,0 +1,1 @@
+javac -d ../../class ../Peer/*.java ../Logger/*.java ../OurContinuousCharReaderUI/*.java ../DatasetWriter/*.java ../TorcsClient/*.java 

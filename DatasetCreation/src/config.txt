@@ -1,5 +1,0 @@
-client_to_dsw.ip=localhost
-client_to_dsw.port=9000
-dsw.filename=../Dataset/dataset.csv
-dsw_to_client.ip=localhost
-dsw_to_client.port=9001

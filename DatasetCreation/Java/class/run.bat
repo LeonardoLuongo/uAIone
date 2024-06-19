@@ -1,0 +1,1 @@
+java src.TorcsClient.Client src.TorcsClient.SimpleDriver host:localhost port:3001 verbose:on
