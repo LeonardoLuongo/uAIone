@@ -11,6 +11,8 @@ The system leverages **Behavioral Cloning** (Imitation Learning), where the AI l
 
 This project was developed for the **Artificial Intelligence: Methods and Applications** course (Prof. Mario Vento) at the **University of Salerno (UNISA)**, Academic Year 2023-2024.
 
+🎥 𝗪𝗮𝘁𝗰𝗵 𝘁𝗵𝗲 𝗔𝗜 𝗶𝗻 𝗮𝗰𝘁𝗶𝗼𝗻: https://drive.google.com/file/d/18XLdoV46sUddqcVO1uUmehplyId9Cz-U/view?usp=sharing
+
 ## ✨ Architecture & Tech Stack
 The system is built on a **Service-Oriented Architecture (SOA)**, allowing parallel development and high efficiency. Components communicate in real-time via **UDP Sockets**.
 
